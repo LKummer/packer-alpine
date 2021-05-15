@@ -1,0 +1,8 @@
+#!/bin/sh
+
+sed -i 's:#\(.*/v.*/community\):\1:' /etc/apk/repositories
+apk update
+apk add qemu-guest-agent
+sed -i 's:/dev/virtio-ports/org.qemu.guest_agent.0:/dev/vport2p1:' /etc/init.d/qemu-guest-agent
+rc-update add qemu-guest-agent
+qemu-ga -p /dev/vport2p1

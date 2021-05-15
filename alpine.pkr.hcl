@@ -31,12 +31,12 @@ variable "http_interface" {
 
 variable "template_name" {
   type = string
-  default = "Alpine-3.13.5"
+  default = "alpine-3.13.5"
 }
 
 variable "template_description" {
   type = string
-  default = "Alpine Linux template."
+  default = "Alpine Linux with QEMU guest agent and cloud-init."
 }
 
 source "proxmox-iso" "pve" {
@@ -94,11 +94,19 @@ source "proxmox-iso" "pve" {
     "reboot<enter><wait30>",
     "root<enter>",
     "${var.ssh_password}<enter><wait>",
-    "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup<enter>",
-    "sh qemu-setup<enter><wait>"
+    "wget --quiet -O- http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup | sh<enter><wait>"
   ]
+
+  cloud_init = true
+  cloud_init_storage_pool = "local-lvm"
 }
 
 build {
   sources = ["source.proxmox-iso.pve"]
+
+  provisioner "shell" {
+    inline = [
+      "apk add cloud-init"
+    ]
+  }
 }

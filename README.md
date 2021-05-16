@@ -13,7 +13,7 @@ See `secrets.example.pkr.hcl` as an example.
 Run the build command:
 
 ```s
-$ packer build --var-file .\secrets.pkr.hcl alpine.pkr.hcl
+$ packer build --var-file ./secrets.pkr.hcl alpine.pkr.hcl
 ```
 
 ## Notes

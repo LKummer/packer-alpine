@@ -31,7 +31,7 @@ variable "http_interface" {
 
 variable "template_name" {
   type = string
-  default = "alpine-3.13.5"
+  default = "alpine-3.13.5-cloud"
 }
 
 variable "template_description" {
@@ -91,7 +91,7 @@ source "proxmox-iso" "pve" {
     "mount /dev/sda3 /mnt<enter>",
     "rc-service sshd stop<enter>",
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
-    "reboot<enter><wait30>",
+    "reboot<enter><wait45>",
     "root<enter>",
     "${var.ssh_password}<enter><wait>",
     "wget --quiet -O- http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup | sh<enter><wait>"
@@ -106,7 +106,16 @@ build {
 
   provisioner "shell" {
     inline = [
-      "apk add cloud-init"
+      "apk add sudo cloud-init",
+      # Add default cloud-init user.
+      "useradd alpine",
+      "echo 'alpine ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers",
+      # Setup serial terminal.
+      "sed -i 's/default_kernel_opts=\"\\(.*\\)\"/default_kernel_opts=\"console=tty1 console=ttyS0 \\1\"/' /etc/update-extlinux.conf",
+      "update-extlinux",
+      # Clean up
+      "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
+      "setup-cloud-init",
     ]
   }
 }

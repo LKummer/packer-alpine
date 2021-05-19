@@ -106,6 +106,7 @@ build {
 
   provisioner "shell" {
     inline = [
+      "apk add python3 py3-pip",
       "apk add sudo cloud-init",
       # Add default cloud-init user.
       "useradd alpine",

@@ -1,7 +1,7 @@
 # Packer Alpine
 
 Packer setup for creating Alpine Linux images on Proxmox.
-Builds images with QEMU guest agent and Cloud Init.
+Builds images with Cloud Init, QEMU guest agent and Python 3 for easy provisioning with Ansible.
 
 ## Build Instructions
 
@@ -13,7 +13,7 @@ See `secrets.example.pkr.hcl` as an example.
 Run the build command:
 
 ```s
-$ packer build --var-file ./secrets.pkr.hcl alpine.pkr.hcl
+$ packer build --var-file secrets.pkr.hcl alpine.pkr.hcl
 ```
 
 ## Notes

@@ -100,7 +100,7 @@ source "proxmox-iso" "alpine" {
     "rc-service sshd stop<enter>",
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
     "reboot<enter><wait45>",
-    "root<enter>",
+    "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",
     "wget --quiet -O- http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup | sh<enter><wait>"
   ]

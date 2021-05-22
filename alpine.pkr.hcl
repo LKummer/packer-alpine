@@ -39,7 +39,7 @@ variable "http_interface" {
 
 variable "template_name" {
   type = string
-  default = "alpine-3.13.5-cloud"
+  default = "Alpine-3.13.5"
 }
 
 variable "template_description" {

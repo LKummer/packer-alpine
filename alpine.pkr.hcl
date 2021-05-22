@@ -8,6 +8,14 @@ variable "proxmox_password" {
   sensitive = true
 }
 
+variable "proxmox_url" {
+  type = string
+}
+
+variable "proxmox_node" {
+  type = string
+}
+
 variable "ssh_password" {
   type = string
   default = "1234"
@@ -39,12 +47,12 @@ variable "template_description" {
   default = "Alpine Linux with QEMU guest agent and cloud-init."
 }
 
-source "proxmox-iso" "pve" {
-  proxmox_url = "https://pve.kummer.local:8006/api2/json"
+source "proxmox-iso" "alpine" {
+  proxmox_url = var.proxmox_url
   insecure_skip_tls_verify = true
   username = var.proxmox_username
   password = var.proxmox_password
-  node = "pve"
+  node = var.proxmox_node
 
   http_interface = var.http_interface
 
@@ -102,7 +110,7 @@ source "proxmox-iso" "pve" {
 }
 
 build {
-  sources = ["source.proxmox-iso.pve"]
+  sources = ["source.proxmox-iso.alpine"]
 
   provisioner "shell" {
     inline = [

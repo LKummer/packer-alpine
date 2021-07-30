@@ -119,9 +119,6 @@ build {
       # Add default cloud-init user.
       "useradd alpine",
       "echo 'alpine ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers",
-      # Setup serial terminal.
-      "sed -i 's/default_kernel_opts=\"\\(.*\\)\"/default_kernel_opts=\"console=tty1 console=ttyS0 \\1\"/' /etc/update-extlinux.conf",
-      "update-extlinux",
       # Clean up
       "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
       "setup-cloud-init",

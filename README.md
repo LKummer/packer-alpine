@@ -18,6 +18,8 @@ $ packer build --var-file secrets.pkr.hcl alpine.pkr.hcl
 
 ## Notes
 
+Set `PACKER_LOG=1` to enable logging for easier troubleshooting.
+
 `answers` file for `setup-alpine` must use LF line endings.
 This might cause issues when cloning on Windows.
 

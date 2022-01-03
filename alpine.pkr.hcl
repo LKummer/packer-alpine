@@ -22,12 +22,12 @@ variable "ssh_password" {
 
 variable "iso" {
   type = string
-  default = "https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.0-x86_64.iso"
+  default = "https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.3-x86_64.iso"
 }
 
 variable "iso_checksum" {
   type = string
-  default = "d568c6c71bb1eee0f65cdf40088daf57032e24f1e3bd2cf8a813f80d2e9e4eab"
+  default = "4a62a5dabd61e7cb8f865d95781b9f070f32300ba784553b61efef2b65a8347b"
 }
 
 variable "http_interface" {
@@ -37,7 +37,7 @@ variable "http_interface" {
 
 variable "template_name" {
   type = string
-  default = "Alpine-3.14.0"
+  default = "Alpine-3.14.3"
 }
 
 variable "template_description" {

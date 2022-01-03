@@ -20,6 +20,11 @@ variable "ssh_password" {
   sensitive = true
 }
 
+variable "ssh_port" {
+  type = string
+  default = "2222"
+}
+
 variable "iso" {
   type = string
   default = "https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.3-x86_64.iso"
@@ -82,14 +87,15 @@ source "proxmox-iso" "alpine" {
 
   ssh_username = "root"
   ssh_password = var.ssh_password
+  ssh_port = var.ssh_port
   ssh_timeout = "5m"
 
   http_directory = "http"
   
   boot_command = [
     "root<enter><wait>",
-    "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait>",
-    "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
+    "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait5>",
+    "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait2>",
     "setup-alpine -f answers<enter><wait>",
     "${var.ssh_password}<enter><wait>",
     "${var.ssh_password}<enter><wait5>",
@@ -97,6 +103,7 @@ source "proxmox-iso" "alpine" {
     "mount /dev/sda3 /mnt<enter>",
     "rc-service sshd stop<enter>",
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
+    "echo 'Port ${var.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
     "reboot<enter><wait45>",
     "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",

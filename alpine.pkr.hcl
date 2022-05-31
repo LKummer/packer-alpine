@@ -27,12 +27,12 @@ variable "ssh_port" {
 
 variable "iso" {
   type = string
-  default = "https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.3-x86_64.iso"
+  default = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.0-x86_64.iso"
 }
 
 variable "iso_checksum" {
   type = string
-  default = "4a62a5dabd61e7cb8f865d95781b9f070f32300ba784553b61efef2b65a8347b"
+  default = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
 }
 
 variable "http_interface" {
@@ -42,7 +42,7 @@ variable "http_interface" {
 
 variable "template_name" {
   type = string
-  default = "Alpine-3.14.3"
+  default = "Alpine-3.16.0"
 }
 
 variable "template_description" {
@@ -96,9 +96,15 @@ source "proxmox-iso" "alpine" {
     "root<enter><wait>",
     "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait5>",
     "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait2>",
-    "setup-alpine -f answers<enter><wait>",
+    "setup-alpine -f answers<enter><wait5>",
     "${var.ssh_password}<enter><wait>",
     "${var.ssh_password}<enter><wait5>",
+    # Create non root user, default is no.
+    "<enter>",
+    # Enable password SSH authentication as it is used by Packer.
+    "yes<enter>",
+    # Do not add SSH keys for root.
+    "<enter>",
     "<wait>y<enter><wait10>",
     "mount /dev/sda3 /mnt<enter>",
     "rc-service sshd stop<enter>",

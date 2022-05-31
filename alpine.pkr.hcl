@@ -1,58 +1,73 @@
 variable "proxmox_username" {
+  description = "Proxmox user name to authenticate with."
   type = string
 }
 
 variable "proxmox_password" {
+  description = "Proxmox password to authenticate with."
   type = string
   sensitive = true
 }
 
 variable "proxmox_url" {
+  description = "Proxmox API server URL, with /api2/json suffix."
   type = string
 }
 
 variable "proxmox_node" {
+  description = "Proxmox node ID to create the template on."
   type = string
 }
 
 variable "ssh_password" {
+  description = "Root user password."
   type = string
   sensitive = true
 }
 
 variable "ssh_port" {
+  description = "SSH port to configure the template to use."
   type = string
   default = "2222"
 }
 
 variable "iso" {
+  description = "Alpine Linux virtual release ISO URL."
   type = string
   default = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.0-x86_64.iso"
 }
 
 variable "iso_checksum" {
+  description = "Checksum for verifying the ISO."
   type = string
   default = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
 }
 
 variable "http_interface" {
+  description = "Computers with more than one network interfaces may need this set for the HTTP server to work."
   type = string
   default = null
 }
 
 variable "template_name" {
+  description = "Name of the created template."
   type = string
   default = "Alpine-3.16.0"
 }
 
 variable "template_name_suffix" {
+  description = "Suffix added to template_name, used to add Git commit hash or tag to template name."
   type = string
   default = ""
 }
 
 variable "template_description" {
+  description = "Description of the created template."
   type = string
-  default = "Alpine Linux with QEMU guest agent and cloud-init."
+  default = <<EOF
+Alpine Linux cloud image with QEMU guest agent, cloud-init and Python.
+https://git.houseofkummer.com/homelab/devops/packer-alpine
+EOF
 }
 
 source "proxmox-iso" "alpine" {

@@ -45,6 +45,11 @@ variable "template_name" {
   default = "Alpine-3.16.0"
 }
 
+variable "template_name_suffix" {
+  type = string
+  default = ""
+}
+
 variable "template_description" {
   type = string
   default = "Alpine Linux with QEMU guest agent and cloud-init."
@@ -63,7 +68,7 @@ source "proxmox-iso" "alpine" {
   iso_url = var.iso
   iso_checksum = var.iso_checksum
 
-  template_name = var.template_name
+  template_name = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description
 
   unmount_iso = true

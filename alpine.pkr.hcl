@@ -43,12 +43,6 @@ variable "iso_checksum" {
   default = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
 }
 
-variable "http_interface" {
-  description = "Computers with more than one network interfaces may need this set for the HTTP server to work."
-  type = string
-  default = null
-}
-
 variable "template_name" {
   description = "Name of the created template."
   type = string
@@ -76,8 +70,6 @@ source "proxmox-iso" "alpine" {
   username = var.proxmox_username
   password = var.proxmox_password
   node = var.proxmox_node
-
-  http_interface = var.http_interface
 
   iso_storage_pool = "local"
   iso_url = var.iso

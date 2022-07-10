@@ -10,6 +10,17 @@ Ensure Packer is installed.
 Create a variable file `secrets.pkr.hcl` for Proxmox credentials and other variables.
 See `secrets.example.pkr.hcl` as an example.
 
+Set `PROXMOX_URL`, `PROXMOX_USERNAME` and `PROXMOX_TOKEN` environment variables.
+[See the Proxmox builder documentation](https://www.packer.io/plugins/builders/proxmox/iso) for more information.
+
+It is recommended to use a `.env` file to manage credentials. For example:
+
+```sh
+export PROXMOX_URL='https://192.168.0.100:8006/api2/json'
+export PROXMOX_USERNAME='user@pve!token'
+export PROXMOX_TOKEN='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+```
+
 Build with a template name suffix denoting the current commit, for example `2b1adb0`:
 
 ```s

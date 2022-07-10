@@ -1,19 +1,3 @@
-variable "proxmox_username" {
-  description = "Proxmox user name to authenticate with."
-  type = string
-}
-
-variable "proxmox_password" {
-  description = "Proxmox password to authenticate with."
-  type = string
-  sensitive = true
-}
-
-variable "proxmox_url" {
-  description = "Proxmox API server URL, with /api2/json suffix."
-  type = string
-}
-
 variable "proxmox_node" {
   description = "Proxmox node ID to create the template on."
   type = string
@@ -65,10 +49,7 @@ EOF
 }
 
 source "proxmox-iso" "alpine" {
-  proxmox_url = var.proxmox_url
   insecure_skip_tls_verify = true
-  username = var.proxmox_username
-  password = var.proxmox_password
   node = var.proxmox_node
 
   iso_storage_pool = "local"

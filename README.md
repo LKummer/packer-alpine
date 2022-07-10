@@ -10,15 +10,18 @@ Ensure Packer is installed.
 Create a variable file `secrets.pkr.hcl` for Proxmox credentials and other variables.
 See `secrets.example.pkr.hcl` as an example.
 
-Run the build command:
+Build with a template name suffix denoting the current commit, for example `2b1adb0`:
 
 ```s
-$ packer build --var-file secrets.pkr.hcl alpine.pkr.hcl
+$ packer build --var-file secrets.pkr.hcl --var template_name_suffix=-2b1adb0 alpine.pkr.hcl
 ```
 
-## Notes
+## Troubleshooting
 
 Set `PACKER_LOG=1` to enable logging for easier troubleshooting.
+
+Avoid running Packer on Windows.
+This repository, Packer and Alpine all assume you are running on Linux.
 
 `answers` file for `setup-alpine` must use LF line endings.
 This might cause issues when cloning on Windows.

@@ -147,9 +147,6 @@ build {
     inline = [
       "apk add python3 py3-pip",
       "apk add sudo cloud-init",
-      # Add default cloud-init user.
-      "useradd alpine",
-      "echo 'alpine ALL=(ALL) ALL' >> /etc/sudoers",
       # Clean up
       "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
       "setup-cloud-init",

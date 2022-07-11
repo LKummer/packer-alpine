@@ -1,7 +1,13 @@
 # Packer Alpine
 
-Packer setup for creating Alpine Linux images on Proxmox.
-Builds images with Cloud Init, QEMU guest agent and Python 3 for easy provisioning with Ansible.
+Packer configuration for building an Alpine Linux 'cloud image' Proxmox template.
+
+Features:
+
+* Includes Cloud Init for configuration when cloning.
+* Includes Python for configuration with Ansible.
+* Includes `sudo` and QEMU guest agent.
+* Tested with Terratest.
 
 ## Development Guide
 
@@ -15,6 +21,12 @@ See `secrets.example.pkr.hcl` as an example.
 
 Set `PROXMOX_URL`, `PROXMOX_USERNAME` and `PROXMOX_TOKEN` environment variables.
 [See the Proxmox builder documentation](https://www.packer.io/plugins/builders/proxmox/iso) for more information.
+
+Build with a template name suffix denoting the current commit, for example `2b1adb0`:
+
+```sh
+packer build --var-file secrets.pkr.hcl --var template_name_suffix=-2b1adb0 alpine.pkr.hcl
+```
 
 ### Test
 
@@ -50,8 +62,8 @@ This might cause issues when cloning on Windows.
 
 ## Useful Resources
 
-* [Packer Proxmox builder from ISO docs](https://www.packer.io/docs/builders/proxmox/iso).
-* [Proxmox docs on creating a custom cloud image](https://pve.proxmox.com/wiki/Cloud-Init_FAQ#Creating_a_custom_cloud_image).
+* [Packer Proxmox ISO builder documentation](https://www.packer.io/docs/builders/proxmox/iso).
+* [Proxmox wiki on creating a custom cloud image](https://pve.proxmox.com/wiki/Cloud-Init_FAQ#Creating_a_custom_cloud_image).
+* [cloud-init documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 * [Alpine cloud-init package readme](https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine).
-* [sed introduction and tutorial](https://www.grymoire.com/Unix/Sed.html).
 * [Alpine Linux downloads](https://www.alpinelinux.org/downloads/).

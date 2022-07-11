@@ -14,19 +14,6 @@ variable "ssh_port" {
   type = string
   default = "2222"
 }
-
-variable "iso" {
-  description = "Alpine Linux virtual release ISO URL."
-  type = string
-  default = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.0-x86_64.iso"
-}
-
-variable "iso_checksum" {
-  description = "Checksum for verifying the ISO."
-  type = string
-  default = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
-}
-
 variable "template_name" {
   description = "Name of the created template."
   type = string
@@ -53,8 +40,8 @@ source "proxmox-iso" "alpine" {
   node = var.proxmox_node
 
   iso_storage_pool = "local"
-  iso_url = var.iso
-  iso_checksum = var.iso_checksum
+  iso_url = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.0-x86_64.iso"
+  iso_checksum = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
 
   template_name = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description

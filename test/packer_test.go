@@ -41,12 +41,14 @@ func TestPackerAlpineBuild(t *testing.T) {
 	sshIP := terraform.Output(t, terraformOptions, "ssh_ip")
 	sshUser := terraform.Output(t, terraformOptions, "user")
 	password := terraform.Output(t, terraformOptions, "password")
-	ssh.CheckSshConnection(t, ssh.Host{
+	host := ssh.Host{
 		Hostname:    sshIP,
 		SshUserName: sshUser,
 		SshKeyPair:  sshKeyPair,
 		CustomPort:  2222,
-	})
+	}
+	// Check SSH with the Cloud Init user works.
+	ssh.CheckSshConnection(t, host)
 
 	// Check SSH password authentication is disabled.
 	err := ssh.CheckSshConnectionE(t, ssh.Host{
@@ -56,4 +58,11 @@ func TestPackerAlpineBuild(t *testing.T) {
 		CustomPort:  2222,
 	})
 	assert.Error(t, err)
+
+	// Check Python is installed.
+	ssh.CheckSshCommand(t, host, "python3 --version")
+	ssh.CheckSshCommand(t, host, "pip --version")
+
+	// Check sudo is installed.
+	ssh.CheckSshCommand(t, host, "sudo --version")
 }

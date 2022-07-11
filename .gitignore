@@ -1,4 +1,13 @@
+# Packer files
 packer_cache
 secrets*
 !secrets.example*
+
+# Terraform lock and state files.
+*.lock.hcl
+*.tfstate
+*.tfstate.backup
+.terraform
+
+# Development environment variables.
 .env

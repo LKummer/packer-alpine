@@ -3,9 +3,12 @@
 Packer setup for creating Alpine Linux images on Proxmox.
 Builds images with Cloud Init, QEMU guest agent and Python 3 for easy provisioning with Ansible.
 
-## Build Instructions
+## Development Guide
 
 Ensure Packer is installed.
+This project was developed against Packer `v1.8.2`.
+
+### Build
 
 Create a variable file `secrets.pkr.hcl` for Proxmox credentials and other variables.
 See `secrets.example.pkr.hcl` as an example.
@@ -13,18 +16,26 @@ See `secrets.example.pkr.hcl` as an example.
 Set `PROXMOX_URL`, `PROXMOX_USERNAME` and `PROXMOX_TOKEN` environment variables.
 [See the Proxmox builder documentation](https://www.packer.io/plugins/builders/proxmox/iso) for more information.
 
-It is recommended to use a `.env` file to manage credentials. For example:
+### Test
+
+Testing requires `PROXMOX_URL`, `PROXMOX_USERNAME`, `PROXMOX_TOKEN`, `PM_API_TOKEN_ID` and `PM_API_TOKEN_SECRET` environment variables set, as well as `secrets.pkr.hcl` (see `secrets.example.pkr.hcl`).
+
+For testing and development it is recommended to use a `.env` file to manage credentials.
+For example:
 
 ```sh
 export PROXMOX_URL='https://192.168.0.100:8006/api2/json'
 export PROXMOX_USERNAME='user@pve!token'
 export PROXMOX_TOKEN='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+export PM_API_TOKEN_ID="$PROXMOX_USERNAME"
+export PM_API_TOKEN_SECRET="$PROXMOX_TOKEN"
 ```
 
-Build with a template name suffix denoting the current commit, for example `2b1adb0`:
+Navigate to the `test` folder and run the tests:
 
-```s
-$ packer build --var-file secrets.pkr.hcl --var template_name_suffix=-2b1adb0 alpine.pkr.hcl
+```sh
+cd test
+go test ./...
 ```
 
 ## Troubleshooting

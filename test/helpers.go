@@ -109,7 +109,6 @@ func findProxmoxVMID(t testing.TestingT, name string) string {
 	machines := ProxmoxVMList{}
 	err = json.Unmarshal(buf.Bytes(), &machines)
 	assert.NoError(t, err)
-	fmt.Println(machines)
 
 	matchingMachines := []ProxmoxVM{}
 	for _, machine := range machines.Data {

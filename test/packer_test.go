@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/packer"
 	"github.com/gruntwork-io/terratest/modules/ssh"
@@ -21,6 +22,8 @@ func TestPackerAlpineBuild(t *testing.T) {
 
 	defer deleteProxmoxVM(t, "Alpine-3.16.0-test")
 	packer.BuildArtifact(t, packerOptions)
+	// Proxmox takes a second to rename the template.
+	time.Sleep(5 * time.Second)
 
 	sshKeyPair := generateED25519KeyPair(t)
 

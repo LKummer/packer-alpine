@@ -47,8 +47,9 @@ func TestPackerAlpineBuild(t *testing.T) {
 		SshKeyPair:  sshKeyPair,
 		CustomPort:  2222,
 	}
-	// Check SSH with the Cloud Init user works.
-	ssh.CheckSshConnection(t, host)
+
+	// Check Cloud Init ran successfully and SSH works.
+	ssh.CheckSshCommand(t, host, "cloud-init status --wait")
 
 	// Check SSH password authentication is disabled.
 	err := ssh.CheckSshConnectionE(t, ssh.Host{

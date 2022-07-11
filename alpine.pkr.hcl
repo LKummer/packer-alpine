@@ -105,8 +105,10 @@ build {
 
   provisioner "shell" {
     inline = [
-      "apk add python3 py3-pip",
-      "apk add sudo cloud-init",
+      "apk add python3 py3-pip sudo",
+      # e2fsprogs-extra is required by Cloud Init for creating/resizing filesystems.
+      # See https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine.
+      "apk add cloud-init e2fsprogs-extra",
       # Clean up
       "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
       "setup-cloud-init",

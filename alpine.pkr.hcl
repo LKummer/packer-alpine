@@ -103,15 +103,25 @@ source "proxmox-iso" "alpine" {
 build {
   sources = ["source.proxmox-iso.alpine"]
 
+  # Python, sudo and Cloud Init setup.
   provisioner "shell" {
     inline = [
       "apk add python3 py3-pip sudo",
       # e2fsprogs-extra is required by Cloud Init for creating/resizing filesystems.
       # See https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine.
       "apk add cloud-init e2fsprogs-extra",
-      # Clean up
-      "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
       "setup-cloud-init",
+    ]
+  }
+
+  # Cleanup.
+  provisioner "shell" {
+    inline = [
+      # Password SSH login is already disabled by Cloud Init.
+      "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
+      "passwd --lock root",
+      # Remove command history and authorized keys.
+      "rm -rf /root/.ash_history"
     ]
   }
 }

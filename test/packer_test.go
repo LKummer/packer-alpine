@@ -60,6 +60,13 @@ func TestPackerAlpineBuild(t *testing.T) {
 	})
 	assert.Error(t, err)
 
+	// Check root password is locked.
+	rootPasswordStatus := ssh.CheckSshCommand(t, host, "sudo passwd --status root")
+	assert.Regexp(t, "^root L ", rootPasswordStatus)
+
+	// Check root shell history file is not present.
+	ssh.CheckSshCommand(t, host, "!(sudo test -f /root/.ash_history)")
+
 	// Check Python is installed.
 	ssh.CheckSshCommand(t, host, "python3 --version")
 	ssh.CheckSshCommand(t, host, "pip --version")

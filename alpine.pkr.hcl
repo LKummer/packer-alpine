@@ -86,11 +86,13 @@ source "proxmox-iso" "alpine" {
     # Do not add SSH keys for root.
     "<enter>",
     "<wait>y<enter><wait10>",
+    # Mount installation partition and change SSHD config.
+    # It will be disabled later by Cloud Init.
     "mount /dev/sda3 /mnt<enter>",
-    "rc-service sshd stop<enter>",
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
     "echo 'Port ${var.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
-    "reboot<enter><wait45>",
+    # Reboot and setup QEMU Guest Agent so Packer can connect with SSH.
+    "reboot<enter><wait30>",
     "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",
     "wget --quiet -O- http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup | sh<enter><wait>"

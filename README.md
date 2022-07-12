@@ -11,8 +11,13 @@ Features:
 
 ## Development Guide
 
-Ensure Packer is installed.
-This project was developed against Packer `v1.8.2`.
+Required tools:
+
+* Packer `v1.8.2`.
+* Terraform `v1.2.4`.
+* Go `1.18.2`.
+
+For building only Packer is required.
 
 ### Build
 

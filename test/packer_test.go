@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gruntwork-io/terratest/modules/packer"
 	"github.com/gruntwork-io/terratest/modules/ssh"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -11,16 +12,17 @@ import (
 )
 
 func TestPackerAlpineBuild(t *testing.T) {
+	templateName := "packer-alpine-test-" + uuid.NewString()
 	packerOptions := &packer.Options{
 		Template:   "alpine.pkr.hcl",
 		WorkingDir: "..",
 		VarFiles:   []string{"secrets.pkr.hcl"},
 		Vars: map[string]string{
-			"template_name_suffix": "-test",
+			"template_name": templateName,
 		},
 	}
 
-	defer deleteProxmoxVM(t, "Alpine-3.16.0-test")
+	defer deleteProxmoxVM(t, templateName)
 	packer.BuildArtifact(t, packerOptions)
 	// Proxmox takes a second to rename the template.
 	time.Sleep(5 * time.Second)
@@ -31,7 +33,7 @@ func TestPackerAlpineBuild(t *testing.T) {
 		TerraformDir: "terraform",
 		Vars: map[string]interface{}{
 			"cloud_init_public_keys": sshKeyPair.PublicKey,
-			"proxmox_template":       "Alpine-3.16.0-test",
+			"proxmox_template":       templateName,
 		},
 	})
 

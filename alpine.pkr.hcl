@@ -122,7 +122,7 @@ build {
       # Password SSH login is already disabled by Cloud Init.
       "sed -i '/PermitRootLogin yes/d' /etc/ssh/sshd_config",
       "passwd --lock root",
-      # Remove command history and authorized keys.
+      # Remove command history.
       "rm -rf /root/.ash_history"
     ]
   }

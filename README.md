@@ -72,4 +72,4 @@ This might cause issues when cloning on Windows.
 * [cloud-init documentation](https://cloudinit.readthedocs.io/en/latest/index.html).
 * [Alpine cloud-init package readme](https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine).
 * [Alpine Linux downloads](https://www.alpinelinux.org/downloads/).
-* [cisagov/skeleton-packer skeleton project](https://github.com/cisagov/skeleton-packer).
+* [Setting up Proxmox role with permissions for Packer](https://github.com/hashicorp/packer/issues/8463#issuecomment-726844945).

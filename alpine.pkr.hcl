@@ -75,20 +75,27 @@ source "proxmox-iso" "alpine" {
   boot_command = [
     "root<enter><wait>",
     "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait5>",
-    "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait2>",
-    "setup-alpine -f answers<enter><wait5>",
-    "${var.ssh_password}<enter><wait>",
-    "${var.ssh_password}<enter><wait5>",
-    # Create non root user, default is no.
-    "<enter>",
+    "setup-alpine -q<enter><wait>",
+    # Select US keyboard layout.
+    "us<enter>",
+    "us<enter><wait5s>",
+    # Set root password.
+    "passwd root<enter>",
+    "${var.ssh_password}<enter>",
+    "${var.ssh_password}<enter>",
+    "setup-timezone -z Israel<enter>",
+    "setup-sshd -c openssh<enter>",
     # Enable password SSH authentication as it is used by Packer.
     "yes<enter>",
     # Do not add SSH keys for root.
     "<enter>",
-    "<wait>y<enter><wait10>",
+    "setup-disk -m sys<enter>",
+    # Choose sda.
+    "<enter>",
+    "y<enter><wait10>",
     # Mount installation partition and change SSHD config.
-    # It will be disabled later by Cloud Init.
     "mount /dev/sda3 /mnt<enter>",
+    # It will be disabled later by Cloud Init.
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
     "echo 'Port ${var.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
     # Reboot and setup QEMU Guest Agent so Packer can connect with SSH.

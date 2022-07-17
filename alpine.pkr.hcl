@@ -70,42 +70,40 @@ source "proxmox-iso" "alpine" {
   ssh_port = var.ssh_port
   ssh_timeout = "5m"
 
-  http_directory = "http"
-  
   boot_command = [
     "root<enter><wait>",
-    "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait5>",
+    "ifconfig 'eth0' up && udhcpc -i 'eth0'<enter><wait5s>",
     "setup-alpine -q<enter><wait>",
     # Select US keyboard layout.
     "us<enter>",
-    "us<enter><wait5s>",
+    "us<enter><wait10s>",
     # Set root password.
     "passwd root<enter>",
     "${var.ssh_password}<enter>",
     "${var.ssh_password}<enter>",
-    "setup-timezone -z Israel<enter>",
-    "setup-sshd -c openssh<enter>",
+    "setup-timezone -z Israel<enter><wait>",
+    "setup-sshd -c openssh<enter><wait>",
     # Enable password SSH authentication as it is used by Packer.
-    "yes<enter>",
+    "yes<enter><wait>",
     # Do not add SSH keys for root.
-    "<enter>",
+    "<enter><wait>",
     "setup-disk -m sys<enter>",
     # Choose sda.
     "<enter>",
-    "y<enter><wait15>",
+    "y<enter><wait15s>",
     # Mount installation partition and change SSHD config.
     "mount /dev/sda3 /mnt<enter>",
     # It will be disabled later by Cloud Init.
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
     "echo 'Port ${var.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
     # Reboot and setup QEMU Guest Agent so Packer can connect with SSH.
-    "reboot<enter><wait30>",
+    "reboot<enter><wait30s>",
     "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",
     # Enable community repository.
     "sed -i 's:# \\(.*/v.*/community\\):\\1:' /etc/apk/repositories<enter>",
-    "apk update<enter><wait5>",
-    "apk add qemu-guest-agent<enter><wait5>",
+    "apk update<enter><wait5s>",
+    "apk add qemu-guest-agent<enter><wait5s>",
     # Set device path to /dev/vport2p1 for QEMU guest agent.
     "sed -i 's:/dev/virtio-ports/org.qemu.guest_agent.0:/dev/vport2p1:' /etc/init.d/qemu-guest-agent<enter>",
     # Add and start OpenRC service.

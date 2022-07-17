@@ -16,9 +16,10 @@ func TestPackerAlpineBuild(t *testing.T) {
 	packerOptions := &packer.Options{
 		Template:   "alpine.pkr.hcl",
 		WorkingDir: "..",
-		VarFiles:   []string{"secrets.pkr.hcl"},
 		Vars: map[string]string{
 			"template_name": templateName,
+			"proxmox_node": "bfte",
+			"ssh_password": "FOR_TESTING_ONLY",
 		},
 	}
 

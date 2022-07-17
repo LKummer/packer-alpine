@@ -92,7 +92,7 @@ source "proxmox-iso" "alpine" {
     "setup-disk -m sys<enter>",
     # Choose sda.
     "<enter>",
-    "y<enter><wait10>",
+    "y<enter><wait15>",
     # Mount installation partition and change SSHD config.
     "mount /dev/sda3 /mnt<enter>",
     # It will be disabled later by Cloud Init.
@@ -102,7 +102,15 @@ source "proxmox-iso" "alpine" {
     "reboot<enter><wait30>",
     "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",
-    "wget --quiet -O- http://{{ .HTTPIP }}:{{ .HTTPPort }}/qemu-setup | sh<enter><wait>"
+    # Enable community repository.
+    "sed -i 's:# \\(.*/v.*/community\\):\\1:' /etc/apk/repositories<enter>",
+    "apk update<enter><wait5>",
+    "apk add qemu-guest-agent<enter><wait5>",
+    # Set device path to /dev/vport2p1 for QEMU guest agent.
+    "sed -i 's:/dev/virtio-ports/org.qemu.guest_agent.0:/dev/vport2p1:' /etc/init.d/qemu-guest-agent<enter>",
+    # Add and start OpenRC service.
+    "rc-update add qemu-guest-agent<enter>",
+    "rc-service qemu-guest-agent start<enter>",
   ]
 
   cloud_init = true

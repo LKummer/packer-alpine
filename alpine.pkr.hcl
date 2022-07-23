@@ -12,7 +12,7 @@ variable "ssh_password" {
 variable "template_name" {
   description = "Name of the created template."
   type = string
-  default = "Alpine-3.16.0"
+  default = "alpine-3.16.1"
 }
 
 variable "template_name_suffix" {
@@ -39,8 +39,8 @@ source "proxmox-iso" "alpine" {
   node = var.proxmox_node
 
   iso_storage_pool = "local"
-  iso_url = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.0-x86_64.iso"
-  iso_checksum = "ba8007f74f9b54fbae3b2520da577831b4834778a498d732f091260c61aa7ca1"
+  iso_url = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.1-x86_64.iso"
+  iso_checksum = "ce507d7f8a0da796339b86705a539d0d9eef5f19eebb1840185ce64be65e7e07"
 
   template_name = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description
@@ -82,10 +82,6 @@ source "proxmox-iso" "alpine" {
     "${var.ssh_password}<enter>",
     "setup-timezone -z Israel<enter><wait>",
     "setup-sshd -c openssh<enter><wait>",
-    # Enable password SSH authentication as it is used by Packer.
-    "yes<enter><wait>",
-    # Do not add SSH keys for root.
-    "<enter><wait>",
     "setup-disk -m sys<enter>",
     # Choose sda.
     "<enter>",
@@ -100,7 +96,7 @@ source "proxmox-iso" "alpine" {
     "root<enter><wait>",
     "${var.ssh_password}<enter><wait>",
     # Enable community repository.
-    "sed -i 's:# \\(.*/v.*/community\\):\\1:' /etc/apk/repositories<enter>",
+    "sed -i 's:#\\(.*/v.*/community\\):\\1:' /etc/apk/repositories<enter>",
     "apk update<enter><wait5s>",
     "apk add qemu-guest-agent<enter><wait5s>",
     # Set device path to /dev/vport2p1 for QEMU guest agent.

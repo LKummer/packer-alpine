@@ -9,11 +9,6 @@ variable "ssh_password" {
   sensitive = true
 }
 
-variable "ssh_port" {
-  description = "SSH port to configure the template to use."
-  type = string
-  default = "2222"
-}
 variable "template_name" {
   description = "Name of the created template."
   type = string
@@ -24,6 +19,10 @@ variable "template_name_suffix" {
   description = "Suffix added to template_name, used to add Git commit hash or tag to template name."
   type = string
   default = ""
+}
+
+local "ssh_port" {
+  expression = "2222"
 }
 
 variable "template_description" {
@@ -67,7 +66,7 @@ source "proxmox-iso" "alpine" {
 
   ssh_username = "root"
   ssh_password = var.ssh_password
-  ssh_port = var.ssh_port
+  ssh_port = local.ssh_port
   ssh_timeout = "5m"
 
   boot_command = [
@@ -95,7 +94,7 @@ source "proxmox-iso" "alpine" {
     "mount /dev/sda3 /mnt<enter>",
     # It will be disabled later by Cloud Init.
     "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
-    "echo 'Port ${var.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
+    "echo 'Port ${local.ssh_port}' >> /mnt/etc/ssh/sshd_config<enter>",
     # Reboot and setup QEMU Guest Agent so Packer can connect with SSH.
     "reboot<enter><wait30s>",
     "root<enter><wait>",

@@ -1,6 +1,21 @@
-# Required PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN variables which are
+stages:
+  - test
+  - release
+
+# See https://docs.gitlab.com/ee/ci/caching/#cache-go-dependencies
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
+# Requires PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN variables which are
 # described in the readme. Make sure to set them in GitLab.
 test-packer:
+  extends: .go-cache
   stage: test
   image: golang:1.18.2
   variables:
@@ -15,10 +30,42 @@ test-packer:
     - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.2.5/terraform_1.2.5_linux_amd64.zip
     - unzip /tmp/terraform.zip
     - mv terraform /usr/local/bin
+    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v1.8.1/gotestsum_1.8.1_linux_amd64.tar.gz
+    - tar -xzf /tmp/gotestsum.tar.gz
+    - mv gotestsum /usr/local/bin
     - cd test
     # Use gotestsum to generate a JUnit-like report.
-    - go run gotest.tools/gotestsum@latest --junitfile report.xml --format testname
+    - gotestsum --junitfile report.xml --format testname
   artifacts:
     when: always
     reports:
       junit: test/report.xml
+
+build-packer:
+  stage: release
+  needs:
+    - test-packer
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  variables:
+    PKR_VAR_template_name_suffix: -${CI_COMMIT_TAG}
+    PKR_VAR_proxmox_node: bfte
+    # TEMPLATE_ROOT_PASSWORD variable must be set.
+    # Note the root account is locked, so the password does not really matter.
+    PKR_VAR_ssh_password: ${TEMPLATE_ROOT_PASSWORD}
+  script:
+    - packer build alpine.pkr.hcl
+
+release:
+  stage: release
+  needs:
+    - build-packer
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo 'running something because it is required'
+  release:
+    tag_name: $CI_COMMIT_TAG
+    description: See alpine-${CI_COMMIt_TAG} template in Proxmox.

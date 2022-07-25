@@ -12,7 +12,7 @@ variable "ssh_password" {
 variable "template_name" {
   description = "Name of the created template."
   type = string
-  default = "alpine-3.16.1"
+  default = "alpine"
 }
 
 variable "template_name_suffix" {

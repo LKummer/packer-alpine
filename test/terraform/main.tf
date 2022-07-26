@@ -5,7 +5,6 @@ module "machine" {
   proxmox_target_node = var.proxmox_target_node
   proxmox_template = var.proxmox_template
 
-  id = 10002
   name = "packer-alpine-test"
   on_boot = true
   memory = 2048

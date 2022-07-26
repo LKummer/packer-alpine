@@ -55,6 +55,14 @@ cd test
 go test ./...
 ```
 
+### Format
+
+Make sure to format files before pushing.
+
+```
+packer fmt .
+```
+
 ## Troubleshooting
 
 Set `PACKER_LOG=1` to enable logging for easier troubleshooting.

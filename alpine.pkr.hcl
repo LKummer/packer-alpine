@@ -1,24 +1,24 @@
 variable "proxmox_node" {
   description = "Proxmox node ID to create the template on."
-  type = string
+  type        = string
 }
 
 variable "ssh_password" {
   description = "Root user password."
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
 variable "template_name" {
   description = "Name of the created template."
-  type = string
-  default = "alpine"
+  type        = string
+  default     = "alpine"
 }
 
 variable "template_name_suffix" {
   description = "Suffix added to template_name, used to add Git commit hash or tag to template name."
-  type = string
-  default = ""
+  type        = string
+  default     = ""
 }
 
 local "ssh_port" {
@@ -27,8 +27,8 @@ local "ssh_port" {
 
 variable "template_description" {
   description = "Description of the created template."
-  type = string
-  default = <<EOF
+  type        = string
+  default     = <<EOF
 Alpine Linux cloud image with QEMU guest agent, cloud-init and Python.
 https://git.houseofkummer.com/homelab/devops/packer-alpine
 EOF
@@ -36,38 +36,38 @@ EOF
 
 source "proxmox-iso" "alpine" {
   insecure_skip_tls_verify = true
-  node = var.proxmox_node
+  node                     = var.proxmox_node
 
   iso_storage_pool = "local"
-  iso_url = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.1-x86_64.iso"
-  iso_checksum = "ce507d7f8a0da796339b86705a539d0d9eef5f19eebb1840185ce64be65e7e07"
+  iso_url          = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.1-x86_64.iso"
+  iso_checksum     = "ce507d7f8a0da796339b86705a539d0d9eef5f19eebb1840185ce64be65e7e07"
 
-  template_name = "${var.template_name}${var.template_name_suffix}"
+  template_name        = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description
 
   unmount_iso = true
 
   scsi_controller = "virtio-scsi-pci"
-  os = "l26"
-  qemu_agent = true
+  os              = "l26"
+  qemu_agent      = true
 
   network_adapters {
-    model = "virtio"
+    model  = "virtio"
     bridge = "vmbr0"
   }
 
   disks {
-    type = "scsi"
-    disk_size = "10G"
-    storage_pool = "local-lvm"
+    type              = "scsi"
+    disk_size         = "10G"
+    storage_pool      = "local-lvm"
     storage_pool_type = "lvm-thin"
-    format = "raw"
+    format            = "raw"
   }
 
   ssh_username = "root"
   ssh_password = var.ssh_password
-  ssh_port = local.ssh_port
-  ssh_timeout = "5m"
+  ssh_port     = local.ssh_port
+  ssh_timeout  = "5m"
 
   boot_command = [
     "root<enter><wait>",
@@ -106,7 +106,7 @@ source "proxmox-iso" "alpine" {
     "rc-service qemu-guest-agent start<enter>",
   ]
 
-  cloud_init = true
+  cloud_init              = true
   cloud_init_storage_pool = "local-lvm"
 }
 

@@ -41,10 +41,17 @@ test-packer:
     reports:
       junit: test/report.xml
 
+format-packer:
+  stage: test
+  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  script:
+    - packer fmt -check .
+
 build-packer:
   stage: release
   needs:
     - test-packer
+    - format-packer
   rules:
     - if: $CI_COMMIT_TAG
   image: docker.houseofkummer.com/homelab/dockops:0.6.0

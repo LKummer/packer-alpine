@@ -57,10 +57,20 @@ go test ./...
 
 ### Format
 
-Make sure to format files before pushing.
+Make sure to format HCL files before pushing.
 
 ```
 packer fmt .
+```
+
+### Test Linting and Formatting
+
+Make sure to format and lint test files before pushing.
+
+```
+cd test
+gofmt -w .
+golangci-lint run
 ```
 
 ## Troubleshooting

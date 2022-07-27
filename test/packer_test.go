@@ -18,8 +18,8 @@ func TestPackerAlpineBuild(t *testing.T) {
 		WorkingDir: "..",
 		Vars: map[string]string{
 			"template_name": templateName,
-			"proxmox_node": "bfte",
-			"ssh_password": "FOR_TESTING_ONLY",
+			"proxmox_node":  "bfte",
+			"ssh_password":  "FOR_TESTING_ONLY",
 		},
 	}
 

@@ -12,11 +12,29 @@ stages:
     paths:
       - .go/pkg/mod/
 
+format-test:
+  image: golang:1.18.2
+  script:
+    - export GOFMT_OUTPUT="$(gofmt -l test)"
+    - echo "$GOFMT_OUTPUT"
+    - '[ $(echo -n $GOFMT_OUTPUT | wc -l) -eq 0 ]'
+
+lint-test:
+  image: golang:1.18.2
+  script:
+    - cd test
+    # Install golangci-lint.
+    - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.45.2
+    - bin/golangci-lint run
+
 # Requires PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN variables which are
 # described in the readme. Make sure to set them in GitLab.
 test-packer:
   extends: .go-cache
   stage: test
+  needs:
+    - format-test
+    - lint-test
   image: golang:1.18.2
   variables:
     PM_API_TOKEN_ID: ${PROXMOX_USERNAME}

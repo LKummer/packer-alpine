@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gruntwork-io/terratest/modules/logger"
 	tgssh "github.com/gruntwork-io/terratest/modules/ssh"
 	"github.com/gruntwork-io/terratest/modules/testing"
 	"github.com/stretchr/testify/assert"
@@ -33,7 +32,6 @@ func generateED25519KeyPair(t testing.TestingT) *tgssh.KeyPair {
 // It is inspired by the existing GenerateRSAKeyPair from Terratest.
 // See https://github.com/gruntwork-io/terratest/blob/v0.40.12/modules/ssh/key_pair.go
 func generateED25519KeyPairE(t testing.TestingT) (*tgssh.KeyPair, error) {
-	logger.Logf(t, "Generating new ED25519 key pair.")
 	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, err
@@ -78,6 +76,7 @@ func deleteProxmoxVMID(t testing.TestingT, vmID string) {
 
 	url := fmt.Sprintf("%s/nodes/bfte/qemu/%s", proxmoxURL, vmID)
 	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	assert.NoError(t, err)
 	req.Header.Set("Authorization", authorization)
 	res, err := client.Do(req)
 	assert.NoError(t, err)
@@ -99,13 +98,15 @@ func findProxmoxVMID(t testing.TestingT, name string) string {
 
 	url := fmt.Sprintf("%s/nodes/bfte/qemu", proxmoxURL)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
+	assert.NoError(t, err)
 	req.Header.Set("Authorization", authorization)
 	res, err := client.Do(req)
 	assert.NoError(t, err)
 	assert.Equal(t, res.StatusCode, http.StatusOK)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(res.Body)
+	_, err = buf.ReadFrom(res.Body)
+	assert.NoError(t, err)
 	machines := ProxmoxVMList{}
 	err = json.Unmarshal(buf.Bytes(), &machines)
 	assert.NoError(t, err)

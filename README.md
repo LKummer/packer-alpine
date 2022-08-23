@@ -9,7 +9,22 @@ Features:
 * Includes `sudo` and QEMU guest agent.
 * Tested with Terratest.
 
-## Development Guide
+## Usage
+
+This template is meant for use [with terraform-proxmox machine module](https://github.com/LKummer/terraform-proxmox/tree/main/modules/machine).
+
+```hcl
+module "example_vm" {
+  source = "github.com/LKummer/terraform-proxmox//modules/machine"
+
+  proxmox_template = "alpine-3.16.2-1"
+  # ...
+}
+```
+
+See [terraform-proxmox machine example for more details](https://github.com/LKummer/terraform-proxmox/tree/main/examples/machine).
+
+## Development
 
 Required tools:
 
@@ -17,9 +32,11 @@ Required tools:
 * Terraform `v1.2.4`.
 * Go `1.18.2`.
 
-For building only Packer is required.
+To create a Proxmox API token with correct privileges, [follow this guide](https://homelab.pages.houseofkummer.com/wiki/administrate/proxmox-api-tokens/).
 
 ### Build
+
+Building only requires Packer.
 
 Create a variable file `secrets.pkr.hcl` for Proxmox credentials and other variables.
 See `secrets.example.pkr.hcl` as an example.
@@ -61,6 +78,7 @@ Make sure to format HCL files before pushing.
 
 ```
 packer fmt .
+packer fmt test/example
 ```
 
 ### Test Linting and Formatting

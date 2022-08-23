@@ -6,6 +6,7 @@ module "machine" {
   proxmox_template = var.proxmox_template
 
   name = "packer-alpine-test"
+  description = "Created by packer-alpine automated testing suite."
   on_boot = true
   memory = 2048
   cores = 2

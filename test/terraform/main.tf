@@ -1,5 +1,5 @@
 module "machine" {
-  source = "github.com/LKummer/terraform-proxmox//modules/machine"
+  source = "github.com/LKummer/terraform-proxmox//modules/machine?ref=1.0.0"
 
   proxmox_api_url = var.proxmox_api_url
   proxmox_target_node = var.proxmox_target_node

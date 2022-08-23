@@ -98,9 +98,6 @@ Set `PACKER_LOG=1` to enable logging for easier troubleshooting.
 Avoid running Packer on Windows.
 This repository, Packer and Alpine all assume you are running on Linux.
 
-`answers` file for `setup-alpine` must use LF line endings.
-This might cause issues when cloning on Windows.
-
 ## Useful Resources
 
 * [Packer Proxmox ISO builder documentation](https://www.packer.io/docs/builders/proxmox/iso).

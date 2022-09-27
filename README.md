@@ -106,3 +106,4 @@ This repository, Packer and Alpine all assume you are running on Linux.
 * [Alpine cloud-init package readme](https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine).
 * [Alpine Linux downloads](https://www.alpinelinux.org/downloads/).
 * [Setting up Proxmox role with permissions for Packer](https://github.com/hashicorp/packer/issues/8463#issuecomment-726844945).
+* [Official Alpine cloud image builder](https://gitlab.alpinelinux.org/alpine/cloud/alpine-cloud-images).

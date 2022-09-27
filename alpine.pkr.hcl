@@ -76,10 +76,6 @@ source "proxmox-iso" "alpine" {
     # Select US keyboard layout.
     "us<enter>",
     "us<enter><wait10s>",
-    # Set root password.
-    "passwd root<enter>",
-    "${var.ssh_password}<enter>",
-    "${var.ssh_password}<enter>",
     "setup-timezone -z Israel<enter><wait>",
     "setup-sshd -c openssh<enter><wait>",
     "setup-disk -m sys<enter>",
@@ -94,7 +90,8 @@ source "proxmox-iso" "alpine" {
     # Reboot and setup QEMU Guest Agent so Packer can connect with SSH.
     "reboot<enter><wait30s>",
     "root<enter><wait>",
-    "${var.ssh_password}<enter><wait>",
+    # Set root password.
+    "echo 'root:${var.ssh_password}' | chpasswd<enter>",
     # Enable community repository.
     "sed -i 's:#\\(.*/v.*/community\\):\\1:' /etc/apk/repositories<enter>",
     "apk update<enter><wait5s>",

@@ -39,8 +39,8 @@ source "proxmox-iso" "alpine" {
   node                     = var.proxmox_node
 
   iso_storage_pool = "local"
-  iso_url          = "https://dl-cdn.alpinelinux.org/alpine/v3.16/releases/x86_64/alpine-virt-3.16.2-x86_64.iso"
-  iso_checksum     = "6c7cb998ec2c8925d5a1239410a4d224b771203f916a18f8015f31169dd767a2"
+  iso_url          = "https://dl-cdn.alpinelinux.org/alpine/v3.17/releases/x86_64/alpine-virt-3.17.0-x86_64.iso"
+  iso_checksum     = "8d4d53bd34b2045e1e219b87887b0de8d217b6cd4a8b476a077429845a5582ba"
 
   template_name        = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description
@@ -116,7 +116,7 @@ build {
       "apk add python3 py3-pip sudo",
       # e2fsprogs-extra is required by Cloud Init for creating/resizing filesystems.
       # See https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine.
-      "apk add cloud-init e2fsprogs-extra",
+      "apk add cloud-init e2fsprogs-extra py3-pyserial py3-netifaces",
       "setup-cloud-init",
     ]
   }

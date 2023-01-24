@@ -54,6 +54,10 @@ func TestPackerAlpineBuild(t *testing.T) {
 	// Check Cloud Init ran successfully and SSH works.
 	ssh.CheckSshCommand(t, host, "cloud-init status --wait")
 
+	// Check disk is resized after cloning.
+	dhOutput := ssh.CheckSshCommand(t, host, "sudo df -h")
+	assert.Regexp(t, "/dev/sda3 *13.5G", dhOutput)
+
 	// Check SSH password authentication is disabled.
 	err := ssh.CheckSshConnectionE(t, ssh.Host{
 		Hostname:    sshIP,

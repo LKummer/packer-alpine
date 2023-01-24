@@ -80,4 +80,22 @@ func TestPackerAlpineBuild(t *testing.T) {
 
 	// Check sudo is installed.
 	ssh.CheckSshCommand(t, host, "sudo --version")
+
+	// Apply with increased disk size.
+	diskResizeOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: "terraform",
+		Vars: map[string]interface{}{
+			"cloud_init_public_keys": sshKeyPair.PublicKey,
+			"proxmox_template":       templateName,
+			"disk_size":              "20G",
+		},
+	})
+	terraform.Apply(t, diskResizeOptions)
+
+	// Wait for the VM to boot, because resizing the disk restarts it.
+	time.Sleep(15 * time.Second)
+
+	// Check filesystem is resized.
+	dhOutput = ssh.CheckSshCommand(t, host, "sudo df -h")
+	assert.Regexp(t, "/dev/sda3 *18.4G", dhOutput)
 }

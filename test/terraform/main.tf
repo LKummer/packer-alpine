@@ -11,6 +11,6 @@ module "machine" {
   memory                 = 2048
   cores                  = 2
   disk_pool              = "local-lvm"
-  disk_size              = "15G"
+  disk_size              = var.disk_size
   cloud_init_public_keys = var.cloud_init_public_keys
 }

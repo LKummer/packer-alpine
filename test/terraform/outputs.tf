@@ -11,6 +11,6 @@ output "user" {
 }
 
 output "password" {
-  value = module.machine.password
+  value     = module.machine.password
   sensitive = true
 }

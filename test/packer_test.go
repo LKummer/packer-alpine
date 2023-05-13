@@ -93,7 +93,7 @@ func TestPackerAlpineBuild(t *testing.T) {
 	terraform.Apply(t, diskResizeOptions)
 
 	// Wait for the VM to boot, because resizing the disk restarts it.
-	time.Sleep(15 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	// Check filesystem is resized.
 	dhOutput = ssh.CheckSshCommand(t, host, "sudo df -h")

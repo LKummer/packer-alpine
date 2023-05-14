@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -12,21 +13,24 @@ import (
 )
 
 func TestPackerAlpineBuild(t *testing.T) {
-	templateName := "packer-alpine-test-" + uuid.NewString()
-	packerOptions := &packer.Options{
-		Template:   "alpine.pkr.hcl",
-		WorkingDir: "..",
-		Vars: map[string]string{
-			"template_name": templateName,
-			"proxmox_node":  "bfte",
-			"ssh_password":  "FOR_TESTING_ONLY",
-		},
-	}
+	templateName, ok := os.LookupEnv("TEST_EXISTING_TEMPLATE")
+	if !ok {
+		templateName = "packer-alpine-test-" + uuid.NewString()
+		packerOptions := &packer.Options{
+			Template:   "alpine.pkr.hcl",
+			WorkingDir: "..",
+			Vars: map[string]string{
+				"template_name": templateName,
+				"proxmox_node":  "bfte",
+				"ssh_password":  "FOR_TESTING_ONLY",
+			},
+		}
 
-	defer deleteProxmoxVM(t, templateName)
-	packer.BuildArtifact(t, packerOptions)
-	// Proxmox takes a second to rename the template.
-	time.Sleep(5 * time.Second)
+		defer deleteProxmoxVM(t, templateName)
+		packer.BuildArtifact(t, packerOptions)
+		// Proxmox takes a second to rename the template.
+		time.Sleep(5 * time.Second)
+	}
 
 	sshKeyPair := generateED25519KeyPair(t)
 

@@ -1,6 +1,7 @@
 stages:
   - test
-  - release
+  - build
+  - verify
 
 # See https://docs.gitlab.com/ee/ci/caching/#cache-go-dependencies
 .go-cache:
@@ -27,6 +28,29 @@ lint-test:
     - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.45.2
     - bin/golangci-lint run
 
+format-packer:
+  stage: test
+  image: debian:bullseye
+  script:
+    - apt-get update
+    - apt-get install --yes wget unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - unzip /tmp/packer.zip
+    - mv packer /usr/local/bin
+    - packer fmt -check .
+
+validate-packer:
+  stage: test
+  image: debian:bullseye
+  script:
+    - apt-get update
+    - apt-get install --yes wget unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - unzip /tmp/packer.zip
+    - mv packer /usr/local/bin
+    - packer init alpine.pkr.hcl
+    - packer validate -var-file secrets.example.pkr.hcl alpine.pkr.hcl
+
 # Requires PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN variables which are
 # described in the readme. Make sure to set them in GitLab.
 test-packer:
@@ -35,6 +59,10 @@ test-packer:
   needs:
     - format-test
     - lint-test
+    - format-packer
+    - validate-packer
+  rules:
+    - if: $CI_COMMIT_TAG == null
   image: golang:1.18.2
   variables:
     PM_API_TOKEN_ID: ${PROXMOX_USERNAME}
@@ -60,22 +88,13 @@ test-packer:
     reports:
       junit: test/report.xml
 
-format-packer:
-  stage: test
-  image: debian:bullseye
-  script:
-    - apt-get update
-    - apt-get install --yes wget unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
-    - unzip /tmp/packer.zip
-    - mv packer /usr/local/bin
-    - packer fmt -check .
-
 build-packer:
-  stage: release
+  stage: build
   needs:
-    - test-packer
+    - format-test
+    - lint-test
     - format-packer
+    - validate-packer
   rules:
     - if: $CI_COMMIT_TAG
   image: debian:bullseye
@@ -87,17 +106,46 @@ build-packer:
     PKR_VAR_ssh_password: ${TEMPLATE_ROOT_PASSWORD}
   script:
     - apt-get update
-    - apt-get install --yes unzip
+    - apt-get install --yes wget unzip
     - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
     - packer init alpine.pkr.hcl
     - packer build alpine.pkr.hcl
 
-release:
-  stage: release
+test-packer-artifact:
+  extends: .go-cache
+  stage: verify
   needs:
     - build-packer
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: golang:1.18.2
+  variables:
+    PM_API_TOKEN_ID: ${PROXMOX_USERNAME}
+    PM_API_TOKEN_SECRET: ${PROXMOX_TOKEN}
+    TEST_EXISTING_TEMPLATE: alpine-${CI_COMMIT_TAG}
+  script:
+    - apt-get update
+    - apt-get install --yes unzip
+    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+    - unzip /tmp/terraform.zip
+    - mv terraform /usr/local/bin
+    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v1.8.1/gotestsum_1.8.1_linux_amd64.tar.gz
+    - tar -xzf /tmp/gotestsum.tar.gz
+    - mv gotestsum /usr/local/bin
+    - cd test
+    # Use gotestsum to generate a JUnit-like report.
+    - gotestsum --junitfile report.xml --format testname
+  artifacts:
+    when: always
+    reports:
+      junit: test/report.xml
+
+release:
+  stage: verify
+  needs:
+    - test-packer-artifact
   rules:
     - if: $CI_COMMIT_TAG
   image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -105,4 +153,4 @@ release:
     - echo 'running something because it is required'
   release:
     tag_name: $CI_COMMIT_TAG
-    description: See alpine-${CI_COMMIt_TAG} template in Proxmox.
+    description: See alpine-${CI_COMMIT_TAG} template in Proxmox.

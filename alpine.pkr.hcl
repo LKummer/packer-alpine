@@ -66,11 +66,10 @@ source "proxmox-iso" "alpine" {
   }
 
   disks {
-    type              = "scsi"
-    disk_size         = "10G"
-    storage_pool      = "local-lvm"
-    storage_pool_type = "lvm-thin"
-    format            = "raw"
+    type         = "scsi"
+    disk_size    = "10G"
+    storage_pool = "local-lvm"
+    format       = "raw"
   }
 
   ssh_username = "root"

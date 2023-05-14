@@ -40,17 +40,18 @@ test-packer:
     PM_API_TOKEN_ID: ${PROXMOX_USERNAME}
     PM_API_TOKEN_SECRET: ${PROXMOX_TOKEN}
   script:
-    - apt update
-    - apt install unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.2/packer_1.8.2_linux_amd64.zip
+    - apt-get update
+    - apt-get install --yes unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
-    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.2.5/terraform_1.2.5_linux_amd64.zip
+    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
     - unzip /tmp/terraform.zip
     - mv terraform /usr/local/bin
     - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v1.8.1/gotestsum_1.8.1_linux_amd64.tar.gz
     - tar -xzf /tmp/gotestsum.tar.gz
     - mv gotestsum /usr/local/bin
+    - packer init alpine.pkr.hcl
     - cd test
     # Use gotestsum to generate a JUnit-like report.
     - gotestsum --junitfile report.xml --format testname
@@ -61,8 +62,13 @@ test-packer:
 
 format-packer:
   stage: test
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  image: debian:bullseye
   script:
+    - apt-get update
+    - apt-get install --yes wget unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - unzip /tmp/packer.zip
+    - mv packer /usr/local/bin
     - packer fmt -check .
 
 build-packer:
@@ -72,7 +78,7 @@ build-packer:
     - format-packer
   rules:
     - if: $CI_COMMIT_TAG
-  image: docker.houseofkummer.com/homelab/dockops:0.6.0
+  image: debian:bullseye
   variables:
     PKR_VAR_template_name_suffix: -${CI_COMMIT_TAG}
     PKR_VAR_proxmox_node: bfte
@@ -80,6 +86,12 @@ build-packer:
     # Note the root account is locked, so the password does not really matter.
     PKR_VAR_ssh_password: ${TEMPLATE_ROOT_PASSWORD}
   script:
+    - apt-get update
+    - apt-get install --yes unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - unzip /tmp/packer.zip
+    - mv packer /usr/local/bin
+    - packer init alpine.pkr.hcl
     - packer build alpine.pkr.hcl
 
 release:

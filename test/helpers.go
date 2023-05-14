@@ -61,7 +61,7 @@ func deleteProxmoxVM(t testing.TestingT, name string) {
 	deleteProxmoxVMID(t, id)
 }
 
-func deleteProxmoxVMID(t testing.TestingT, vmID string) {
+func deleteProxmoxVMID(t testing.TestingT, vmID int) {
 	client := new(http.Client)
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -74,7 +74,7 @@ func deleteProxmoxVMID(t testing.TestingT, vmID string) {
 	token := os.Getenv("PROXMOX_TOKEN")
 	authorization := fmt.Sprintf("PVEAPIToken=%s=%s", username, token)
 
-	url := fmt.Sprintf("%s/nodes/bfte/qemu/%s", proxmoxURL, vmID)
+	url := fmt.Sprintf("%s/nodes/bfte/qemu/%d", proxmoxURL, vmID)
 	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	assert.NoError(t, err)
 	req.Header.Set("Authorization", authorization)
@@ -83,7 +83,7 @@ func deleteProxmoxVMID(t testing.TestingT, vmID string) {
 	assert.Equal(t, res.StatusCode, http.StatusOK)
 }
 
-func findProxmoxVMID(t testing.TestingT, name string) string {
+func findProxmoxVMID(t testing.TestingT, name string) int {
 	client := new(http.Client)
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -126,7 +126,7 @@ func findProxmoxVMID(t testing.TestingT, name string) string {
 }
 
 type ProxmoxVM struct {
-	ID   string `json:"vmid"`
+	ID   int    `json:"vmid"`
 	Name string `json:"name"`
 }
 

@@ -28,11 +28,17 @@ See [terraform-proxmox machine example for more details](https://github.com/LKum
 
 Required tools:
 
-* Packer `v1.8.2`.
-* Terraform `v1.2.4`.
+* Packer `v1.8.7`.
+* Terraform `v1.4.6`.
 * Go `1.18.2`.
 
 To create a Proxmox API token with correct privileges, [follow this guide](https://homelab.pages.houseofkummer.com/wiki/administrate/proxmox-api-tokens/).
+
+Make sure to install the required Packer plugins:
+
+```
+packer init alpine.pkr.hcl
+```
 
 ### Build
 
@@ -107,3 +113,4 @@ This repository, Packer and Alpine all assume you are running on Linux.
 * [Alpine Linux downloads](https://www.alpinelinux.org/downloads/).
 * [Setting up Proxmox role with permissions for Packer](https://github.com/hashicorp/packer/issues/8463#issuecomment-726844945).
 * [Official Alpine cloud image builder](https://gitlab.alpinelinux.org/alpine/cloud/alpine-cloud-images).
+* [VMware Photon Packer templates](https://github.com/vmware/photon-packer-templates).

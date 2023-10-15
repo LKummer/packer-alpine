@@ -17,7 +17,7 @@ This template is meant for use [with terraform-proxmox machine module](https://g
 module "example_vm" {
   source = "github.com/LKummer/terraform-proxmox//modules/machine"
 
-  proxmox_template = "alpine-3.16.2-1"
+  proxmox_template = "alpine-3.18.4-1"
   # ...
 }
 ```

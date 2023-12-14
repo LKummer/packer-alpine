@@ -1,5 +1,5 @@
 output "ssh_ip" {
-  value = module.machine.ssh_ip
+  value = module.machine.ip
 }
 
 output "ssh_port" {

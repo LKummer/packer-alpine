@@ -105,7 +105,7 @@ source "proxmox-iso" "alpine" {
     "apk update<enter><wait5s>",
     "apk add qemu-guest-agent<enter><wait5s>",
     # Set device path to /dev/vport2p1 for QEMU guest agent.
-    "sed -i 's:/dev/virtio-ports/org.qemu.guest_agent.0:/dev/vport2p1:' /etc/init.d/qemu-guest-agent<enter>",
+    "sed -i 's:/dev/virtio-ports/org.qemu.guest_agent.0:$(find /dev/vport* | head -n 1):' /etc/init.d/qemu-guest-agent<enter>",
     # Add and start OpenRC service.
     "rc-update add qemu-guest-agent<enter>",
     "rc-service qemu-guest-agent start<enter>",

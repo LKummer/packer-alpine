@@ -91,7 +91,7 @@ func TestPackerAlpineBuild(t *testing.T) {
 		Vars: map[string]interface{}{
 			"cloud_init_public_keys": sshKeyPair.PublicKey,
 			"proxmox_template":       templateName,
-			"disk_size":              "20G",
+			"disk_size":              20,
 		},
 	})
 	terraform.Apply(t, diskResizeOptions)

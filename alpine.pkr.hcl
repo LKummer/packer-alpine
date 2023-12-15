@@ -56,7 +56,7 @@ source "proxmox-iso" "alpine" {
 
   unmount_iso = true
 
-  scsi_controller = "virtio-scsi-pci"
+  scsi_controller = "virtio-scsi-single"
   os              = "l26"
   qemu_agent      = true
 
@@ -70,7 +70,7 @@ source "proxmox-iso" "alpine" {
     disk_size    = "10G"
     storage_pool = "local-lvm"
     format       = "raw"
-    io_thread    = false
+    io_thread    = true
   }
 
   ssh_username = "root"

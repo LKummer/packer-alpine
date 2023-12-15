@@ -120,7 +120,7 @@ test:artifact:
   stage: verify
   rules:
     - if: $CI_COMMIT_TAG
-  image: golang:1.18.2
+  image: golang:1.21.4-bookworm
   variables:
     PROXMOX_VE_API_TOKEN: ${PROXMOX_USERNAME}=${PROXMOX_TOKEN}
     TEST_EXISTING_TEMPLATE: alpine-${CI_COMMIT_TAG}

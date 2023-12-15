@@ -3,6 +3,11 @@ stages:
   - build
   - verify
 
+variables:
+  PACKER_VERSION: 1.9.4
+  TF_VERSION: 1.6.5
+  GOTESTSUM_VERSION: 1.11.0
+
 # See https://docs.gitlab.com/ee/ci/caching/#cache-go-dependencies
 .go-cache:
   variables:
@@ -13,129 +18,121 @@ stages:
     paths:
       - .go/pkg/mod/
 
-format-test:
-  image: golang:1.18.2
+format:test:
+  image: golang:1.21.4-bookworm
   script:
     - export GOFMT_OUTPUT="$(gofmt -l test)"
     - echo "$GOFMT_OUTPUT"
-    - '[ $(echo -n $GOFMT_OUTPUT | wc -l) -eq 0 ]'
+    - "[ $(echo -n $GOFMT_OUTPUT | wc -l) -eq 0 ]"
 
-lint-test:
-  image: golang:1.18.2
+lint:test:
+  image: golangci/golangci-lint:v1.55.2
   script:
     - cd test
-    # Install golangci-lint.
-    - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.45.2
-    - bin/golangci-lint run
+    - golangci-lint run ./...
 
-format-packer:
+format:packer:
   stage: test
-  image: debian:bullseye
-  script:
+  image: debian:bookworm-slim
+  before_script:
     - apt-get update
     - apt-get install --yes wget unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
+  script:
     - packer fmt -check .
 
-validate-packer:
+validate:packer:
   stage: test
-  image: debian:bullseye
-  script:
+  image: debian:bookworm-slim
+  before_script:
     - apt-get update
     - apt-get install --yes wget unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
+  script:
     - packer init alpine.pkr.hcl
     - packer validate -var-file secrets.example.pkr.hcl alpine.pkr.hcl
 
 # Requires PROXMOX_URL, PROXMOX_USERNAME, PROXMOX_TOKEN variables which are
 # described in the readme. Make sure to set them in GitLab.
-test-packer:
+test:packer:
   extends: .go-cache
   stage: test
   needs:
-    - format-test
-    - lint-test
-    - format-packer
-    - validate-packer
+    - format:packer
+    - format:test
+    - lint:test
+    - validate:packer
   rules:
     - if: $CI_COMMIT_TAG == null
-  image: golang:1.18.2
+  image: golang:1.21.4-bookworm
   variables:
-    PM_API_TOKEN_ID: ${PROXMOX_USERNAME}
-    PM_API_TOKEN_SECRET: ${PROXMOX_TOKEN}
-  script:
+    PROXMOX_VE_API_TOKEN: ${PROXMOX_USERNAME}=${PROXMOX_TOKEN}
+  before_script:
     - apt-get update
     - apt-get install --yes unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
-    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     - unzip /tmp/terraform.zip
     - mv terraform /usr/local/bin
-    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v1.8.1/gotestsum_1.8.1_linux_amd64.tar.gz
+    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VERSION}/gotestsum_${GOTESTSUM_VERSION}_linux_amd64.tar.gz
     - tar -xzf /tmp/gotestsum.tar.gz
     - mv gotestsum /usr/local/bin
+  script:
     - packer init alpine.pkr.hcl
     - cd test
-    # Use gotestsum to generate a JUnit-like report.
     - gotestsum --junitfile report.xml --format testname
   artifacts:
     when: always
     reports:
       junit: test/report.xml
 
-build-packer:
+build:packer:
   stage: build
-  needs:
-    - format-test
-    - lint-test
-    - format-packer
-    - validate-packer
   rules:
     - if: $CI_COMMIT_TAG
-  image: debian:bullseye
+  image: debian:bookworm-slim
   variables:
     PKR_VAR_template_name_suffix: -${CI_COMMIT_TAG}
     PKR_VAR_proxmox_node: bfte
     # TEMPLATE_ROOT_PASSWORD variable must be set.
     # Note the root account is locked, so the password does not really matter.
     PKR_VAR_ssh_password: ${TEMPLATE_ROOT_PASSWORD}
-  script:
+  before_script:
     - apt-get update
-    - apt-get install --yes wget unzip
-    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.7/packer_1.8.7_linux_amd64.zip
+    - apt-get install --yes unzip
+    - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin
+  script:
     - packer init alpine.pkr.hcl
     - packer build alpine.pkr.hcl
 
-test-packer-artifact:
+test:artifact:
   extends: .go-cache
   stage: verify
-  needs:
-    - build-packer
   rules:
     - if: $CI_COMMIT_TAG
   image: golang:1.18.2
   variables:
-    PM_API_TOKEN_ID: ${PROXMOX_USERNAME}
-    PM_API_TOKEN_SECRET: ${PROXMOX_TOKEN}
+    PROXMOX_VE_API_TOKEN: ${PROXMOX_USERNAME}=${PROXMOX_TOKEN}
     TEST_EXISTING_TEMPLATE: alpine-${CI_COMMIT_TAG}
-  script:
+  before_script:
     - apt-get update
     - apt-get install --yes unzip
-    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+    - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
     - unzip /tmp/terraform.zip
     - mv terraform /usr/local/bin
-    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v1.8.1/gotestsum_1.8.1_linux_amd64.tar.gz
+    - wget -O /tmp/gotestsum.tar.gz https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VERSION}/gotestsum_${GOTESTSUM_VERSION}_linux_amd64.tar.gz
     - tar -xzf /tmp/gotestsum.tar.gz
     - mv gotestsum /usr/local/bin
+  script:
     - cd test
-    # Use gotestsum to generate a JUnit-like report.
     - gotestsum --junitfile report.xml --format testname
   artifacts:
     when: always
@@ -145,7 +142,7 @@ test-packer-artifact:
 release:
   stage: verify
   needs:
-    - test-packer-artifact
+    - test:artifact
   rules:
     - if: $CI_COMMIT_TAG
   image: registry.gitlab.com/gitlab-org/release-cli:latest

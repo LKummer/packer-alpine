@@ -125,7 +125,7 @@ build {
       "apk add python3 py3-pip sudo",
       # e2fsprogs-extra is required by Cloud Init for creating/resizing filesystems.
       # See https://git.alpinelinux.org/aports/tree/community/cloud-init/README.Alpine.
-      "apk add cloud-init e2fsprogs-extra py3-pyserial py3-netifaces",
+      "apk add cloud-init e2fsprogs-extra mount py3-pyserial py3-netifaces",
       "setup-cloud-init",
     ]
   }

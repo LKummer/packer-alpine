@@ -107,7 +107,7 @@ build:packer:
     PKR_VAR_ssh_password: ${TEMPLATE_ROOT_PASSWORD}
   before_script:
     - apt-get update
-    - apt-get install --yes unzip
+    - apt-get install --yes wget unzip
     - wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip
     - unzip /tmp/packer.zip
     - mv packer /usr/local/bin

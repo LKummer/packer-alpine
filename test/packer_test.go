@@ -98,9 +98,8 @@ func TestPackerAlpineBuild(t *testing.T) {
 
 	// Reboot and wait for VM to boot.
 	ssh.CheckSshCommand(t, host, "sudo reboot")
-	time.Sleep(30 * time.Second)
 
 	// Check filesystem is resized.
-	dhOutput = ssh.CheckSshCommand(t, host, "sudo df -h")
+	dhOutput = ssh.CheckSshCommandWithRetry(t, host, "sudo df -h", 10, 5*time.Second)
 	assert.Regexp(t, "/dev/sda3 *18.4G", dhOutput)
 }

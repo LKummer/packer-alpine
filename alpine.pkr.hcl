@@ -70,6 +70,7 @@ source "proxmox-iso" "alpine" {
     disk_size    = "10G"
     storage_pool = "local-lvm"
     format       = "raw"
+    io_thread    = false
   }
 
   ssh_username = "root"

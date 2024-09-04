@@ -48,8 +48,8 @@ source "proxmox-iso" "alpine" {
   node                     = var.proxmox_node
 
   iso_storage_pool = "local"
-  iso_url          = "https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-virt-3.18.5-x86_64.iso"
-  iso_checksum     = "7b9df963b46872b195daf527085a8fea76c0576d966a71fd18bcd4e1914f0eae"
+  iso_url          = "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-virt-3.20.2-x86_64.iso"
+  iso_checksum     = "file:https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-virt-3.20.2-x86_64.iso.sha256"
 
   template_name        = "${var.template_name}${var.template_name_suffix}"
   template_description = var.template_description
